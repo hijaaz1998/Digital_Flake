@@ -3,6 +3,14 @@ import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import ProductTable from '../components/ProductTable';
 import CategoryTable from '../components/CategoryTable';
+import SubcategoryTable from '../components/SubCategoryTable';
+import Dashboard from '../components/Dashboard';
+import AddProduct from '../components/AddProduct'
+import EditCategory from '../components/EditCategory';
+import EditSubcategory from '../components/EditSubCategory';
+import EditProduct from '../components/EditProduct';
+import AddCategory from '../components/AddCategory';
+import AddSubcategory from '../components/AddSubCategory';
 
 const HomePage: React.FC = () => {
   return (
@@ -15,8 +23,16 @@ const HomePage: React.FC = () => {
           <Sidebar/>
         </div>
         <div className='bg-red-300 flex-1 overflow-auto' style={{ marginLeft: '16.67%' }}>
-          {/* <ProductTable /> */}
-          <CategoryTable />
+          <ProductTable />
+          {/* <CategoryTable /> */}
+          {/* <SubcategoryTable /> */}
+          {/* <Dashboard /> */}
+          {/* <AddProduct /> */}
+          {/* <AddCategory /> */}
+          {/* <AddSubcategory /> */}
+          {/* <EditCategory /> */}
+          {/* <EditSubcategory /> */}
+          {/* <EditProduct /> */}
         </div>
       </div>
     </div>
