@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTable, Column } from 'react-table';
 import { FaRegEdit, FaRegTrashAlt, FaSearch, FaBox } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
 import { Link } from 'react-router-dom';
+import axiosInstance from '../axiosEndPoint/axiosEndPoint';
 
-type User = {
-  id: number;
+type Product = {
+  id: string;  // Changed to string to match _id from the server
   name: string;
   subcategory: string;
   category: string;
@@ -13,39 +14,46 @@ type User = {
   status: string;
 };
 
-const users: User[] = [
-  {
-    id: 13464356,
-    name: "Alice Smith",
-    subcategory: "Subcategory A",
-    category: "Category 1",
-    image: "/digitalFlake.png",
-    status: "active"
-  },
-  {
-    id: 2,
-    name: "Bob Johnson",
-    subcategory: "Subcategory B",
-    category: "Category 2",
-    image: "/background.jpeg",
-    status: "active"
-  },
-  // Add more users as needed
-];
-
 const ProductTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        const response = await axiosInstance.get('/product', {
+          params: { userId }
+        });
+        console.log('products', response.data.products);
+
+        const cleanedProducts: Product[] = response.data.products.map((product: any) => ({
+          id: product._id,
+          name: product.name,
+          subcategory: product.subcategory.name,
+          category: product.category.name,
+          image: product.image,
+          status: product.status ? 'Active' : 'Inactive'
+        }));
+        setProducts(cleanedProducts);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const data = useMemo(() => {
-    if (!searchTerm) return users;
-    return users.filter(user =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    if (!searchTerm) return products;
+    return products.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm]);
+  }, [searchTerm, products]);
 
-  const columns: Column<User>[] = useMemo(() => [
+  const columns: Column<Product>[] = useMemo(() => [
     {
       Header: 'ID',
       accessor: 'id'
@@ -65,7 +73,7 @@ const ProductTable: React.FC = () => {
     {
       Header: 'Image',
       accessor: 'image',
-      Cell: ({ value }) => <img src={value} alt="User" width="50" height="50" />
+      Cell: ({ value }) => <img src={value} alt="Product" width="50" height="50" />
     },
     {
       Header: 'Status',
@@ -93,26 +101,26 @@ const ProductTable: React.FC = () => {
     }
   ], []);
 
-  const handleEdit = (user: User) => {
-    console.log('Edit', user);
+  const handleEdit = (product: Product) => {
+    console.log('Edit', product);
   };
 
-  const handleDeleteClick = (user: User) => {
-    setUserToDelete(user);
+  const handleDeleteClick = (product: Product) => {
+    setProductToDelete(product);
     setIsModalOpen(true);
   };
 
   const handleDeleteConfirm = () => {
-    if (userToDelete) {
-      console.log('Delete', userToDelete);
+    if (productToDelete) {
+      console.log('Delete', productToDelete);
       setIsModalOpen(false);
-      setUserToDelete(null);
+      setProductToDelete(null);
     }
   };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setUserToDelete(null);
+    setProductToDelete(null);
   };
 
   const {
@@ -148,7 +156,7 @@ const ProductTable: React.FC = () => {
         </Link>
       </div>
       <div className="overflow-x-auto mb-1">
-        <div className="max-h-[600px] overflow-y-auto"> {/* Set max-height as needed */}
+        <div className="max-h-[600px] overflow-y-auto">
           <table {...getTableProps()} className="min-w-full bg-white border border-gray-200 table-fixed">
             <thead className="bg-gray-50">
               {headerGroups.map(headerGroup => (

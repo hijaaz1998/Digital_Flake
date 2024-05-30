@@ -6,6 +6,7 @@ import mongoose from './config/dbConnect';
 import authRouter from './routes/authRoute';
 import categoryRoute from './routes/categoryRoute';
 import subCategoryRouter from './routes/subCategoryRoute';
+import productRouter from './routes/productRoute';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/auth', authRouter);
 app.use('/api', categoryRoute);
 app.use('/api', subCategoryRouter)
+app.use('/api', productRouter)
 
 // Start the server
 app.listen(9999, () => {
