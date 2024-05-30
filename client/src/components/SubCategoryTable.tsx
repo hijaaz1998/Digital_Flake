@@ -1,70 +1,81 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTable, Column } from 'react-table';
+import { Link } from 'react-router-dom';
 import { FaRegEdit, FaRegTrashAlt, FaSearch, FaBox } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
+import axiosInstance from '../axiosEndPoint/axiosEndPoint';
+import { toast } from 'react-hot-toast';
 
 type User = {
   id: number;
   name: string;
   subcategory: string;
-  category: string;
+  category: {
+    name: string;
+  };
   image: string;
   status: string;
 };
 
-const users: User[] = [
-  {
-    id: 13464356,
-    name: "Alice Smith",
-    subcategory: "Subcategory A",
-    category: "Category 1",
-    image: "https://via.placeholder.com/150",
-    status: "active"
-  },
-  {
-    id: 2,
-    name: "Bob Johnson",
-    subcategory: "Subcategory B",
-    category: "Category 2",
-    image: "https://via.placeholder.com/150",
-    status: "active"
-  },
-  // Add more users as needed
-];
 
-const SubcategoryTable: React.FC = () => {
+const CategoryTable: React.FC = () => {
+  const [subcategories, setSubategories] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        const response = await axiosInstance.get('/sub_category', {
+          params: { userId }
+        });
+        
+        setSubategories(response.data.subCategories);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        toast.error('Failed to fetch categories');
+      }
+    };
+  
+    fetchCategories();
+  }, []);
+  
+
   const data = useMemo(() => {
-    if (!searchTerm) return users;
-    return users.filter(user =>
+    if (!searchTerm) return subcategories;
+    return subcategories.filter(user =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm]);
+  }, [searchTerm, subcategories]);
+  
 
   const columns: Column<User>[] = useMemo(() => [
     {
       Header: 'ID',
-      accessor: 'id'
-    },
-    {
-      Header: 'Subcategory Name',
-      accessor: 'subcategory'
+      accessor: '_id',
+      Cell: ({ value }) => <span>{value.toString()}</span> // Convert id to string if needed
     },
     {
       Header: 'Category Name',
-      accessor: 'category'
+      accessor: 'category.name' // Access the category name from the user object
+    },
+    {
+      Header: 'Subcategory',
+      accessor: 'name'
     },
     {
       Header: 'Image',
       accessor: 'image',
-      Cell: ({ value }) => <img src={value} alt="User" width="50" height="50" />
+      Cell: ({ value }) => <img src={value} alt="Category" width="50" height="50" />
     },
     {
       Header: 'Status',
-      accessor: 'status'
+      accessor: 'status',
+      Cell: ({ value }) => (
+        <span className={value ? 'text-green-500' : 'text-red-500'}>{value ? 'Active' : 'Inactive'}</span>
+      )
     },
     {
       Header: 'Actions',
@@ -87,6 +98,7 @@ const SubcategoryTable: React.FC = () => {
       )
     }
   ], []);
+  
 
   const handleEdit = (user: User) => {
     console.log('Edit', user);
@@ -122,7 +134,7 @@ const SubcategoryTable: React.FC = () => {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
           <FaBox className="text-xl text-gray-700" />
-          <h1 className="text-2xl font-semibold text-gray-700">Subcategories</h1>
+          <h1 className="text-2xl font-semibold text-gray-700">Sub Categories</h1>
         </div>
         <div className="flex items-center space-x-2 flex-grow justify-center">
           <div className="relative w-full max-w-lg">
@@ -136,9 +148,11 @@ const SubcategoryTable: React.FC = () => {
             />
           </div>
         </div>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">
-          Add Subcategory
-        </button>
+        <Link to={'/add_subcategory'}>
+          <button className="px-4 py-2 bg-violet-800 text-white rounded-lg hover:bg-blue-700">
+            Add New
+          </button>
+        </Link>
       </div>
       <div className="overflow-x-auto mb-1">
         <div className="max-h-[600px] overflow-y-auto"> {/* Set max-height as needed */}
@@ -149,7 +163,7 @@ const SubcategoryTable: React.FC = () => {
                   {headerGroup.headers.map(column => (
                     <th
                       {...column.getHeaderProps()}
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 bg-white z-10"
+                      className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider sticky top-0 bg-violet-800 z-10"
                     >
                       {column.render('Header')}
                     </th>
@@ -165,7 +179,7 @@ const SubcategoryTable: React.FC = () => {
                     {row.cells.map(cell => (
                       <td
                         {...cell.getCellProps()}
-                        className="px-4 py-3 whitespace-nowrap text-sm text-gray-700"
+                        className="px-4 py-3 whitespace-nowrap font-normal text-sm text-black bg-gray-300"
                       >
                         {cell.render('Cell')}
                       </td>
@@ -182,4 +196,4 @@ const SubcategoryTable: React.FC = () => {
   );
 };
 
-export default SubcategoryTable;
+export default CategoryTable;

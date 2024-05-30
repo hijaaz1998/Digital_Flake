@@ -1,38 +1,49 @@
 import React from 'react';
 import { HiHome, HiViewGrid, HiTag, HiShoppingCart, HiChevronRight } from 'react-icons/hi';
+import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar: React.FC = () => {
+  const location = useLocation();
+
+  const getLinkClass = (path: string) => {
+    return location.pathname.includes(path) ? 'bg-violet-800 text-white' : 'bg-gray-300 text-black';
+  };
+
+  const getIconColorClass = (path: string) => {
+    return location.pathname.includes(path) ? 'text-white' : '';
+  };
+
   return (
-    <div className="bg-pink-300 w-2/12 h-full fixed left-0">
+    <div className="w-2/12 h-full fixed left-0">
       <ul className="mt-10">
-        <li className="flex items-center justify-between bg-lime-400 py-4 px-4">
-          <div className="flex items-center">
+        <Link to="/home" className={`block ${getLinkClass('/home')}`}>
+          <li className="flex items-center justify-between py-4 px-4">
             <HiHome className="mr-2 text-2xl" />
             <span className="ml-3">Home</span>
-          </div>
-          <HiChevronRight className="text-black text-xl" />
-        </li>
-        <li className="flex items-center justify-between py-4 px-4 bg-cyan-500">
-          <div className="flex items-center">
+            <HiChevronRight className={`text-xl ml-auto ${getIconColorClass('/home')}`} />
+          </li>
+        </Link>
+        <Link to="/category" className={`block ${getLinkClass('/category')}`}>
+          <li className="flex items-center justify-between py-4 px-4">
             <HiViewGrid className="mr-2 text-2xl" />
             <span className="ml-3">Category</span>
-          </div>
-          <HiChevronRight className="text-black text-xl" />
-        </li>
-        <li className="flex items-center justify-between py-4 px-4 bg-green-400">
-          <div className="flex items-center">
+            <HiChevronRight className={`text-xl ml-auto ${getIconColorClass('/category')}`} />
+          </li>
+        </Link>
+        <Link to="/subcategory" className={`block ${getLinkClass('/subcategory')}`}>
+          <li className="flex items-center justify-between py-4 px-4">
             <HiTag className="mr-2 text-2xl" />
             <span className="ml-3">Subcategory</span>
-          </div>
-          <HiChevronRight className="text-black text-xl" />
-        </li>
-        <li className="flex items-center justify-between py-4 px-4 bg-violet-400">
-          <div className="flex items-center">
+            <HiChevronRight className={`text-xl ml-auto ${getIconColorClass('/subcategory')}`} />
+          </li>
+        </Link>
+        <Link to="/products" className={`block ${getLinkClass('/products')}`}>
+          <li className="flex items-center justify-between py-4 px-4">
             <HiShoppingCart className="mr-2 text-2xl" />
             <span className="ml-3">Products</span>
-          </div>
-          <HiChevronRight className="text-black text-xl" />
-        </li>
+            <HiChevronRight className={`text-xl ml-auto ${getIconColorClass('/products')}`} />
+          </li>
+        </Link>
       </ul>
     </div>
   );

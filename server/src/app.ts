@@ -4,7 +4,8 @@ import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import mongoose from './config/dbConnect';
 import authRouter from './routes/authRoute';
-// import productRoute from './routes/productRoute';
+import categoryRoute from './routes/categoryRoute';
+import subCategoryRouter from './routes/subCategoryRoute';
 
 const app = express();
 
@@ -20,9 +21,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRouter);
-// app.use('/api/product', productRoute);
+app.use('/api', categoryRoute);
+app.use('/api', subCategoryRouter)
 
 // Start the server
-app.listen(8000, () => {
-  console.log('Server started on port 8000');
+app.listen(9999, () => {
+  console.log('Server started on port 9999');
 });

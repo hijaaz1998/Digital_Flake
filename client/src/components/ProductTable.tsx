@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTable, Column } from 'react-table';
 import { FaRegEdit, FaRegTrashAlt, FaSearch, FaBox } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
+import { Link } from 'react-router-dom';
 
 type User = {
   id: number;
@@ -18,7 +19,7 @@ const users: User[] = [
     name: "Alice Smith",
     subcategory: "Subcategory A",
     category: "Category 1",
-    image: "https://via.placeholder.com/150",
+    image: "/digitalFlake.png",
     status: "active"
   },
   {
@@ -26,7 +27,7 @@ const users: User[] = [
     name: "Bob Johnson",
     subcategory: "Subcategory B",
     category: "Category 2",
-    image: "https://via.placeholder.com/150",
+    image: "/background.jpeg",
     status: "active"
   },
   // Add more users as needed
@@ -140,9 +141,11 @@ const ProductTable: React.FC = () => {
             />
           </div>
         </div>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">
-          Add Product
-        </button>
+        <Link to={'/add_product'}>
+          <button className="px-4 py-2 bg-violet-800 text-white rounded-lg hover:bg-blue-700">
+            Add New
+          </button>
+        </Link>
       </div>
       <div className="overflow-x-auto mb-1">
         <div className="max-h-[600px] overflow-y-auto"> {/* Set max-height as needed */}
@@ -153,7 +156,7 @@ const ProductTable: React.FC = () => {
                   {headerGroup.headers.map(column => (
                     <th
                       {...column.getHeaderProps()}
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 bg-white z-10"
+                      className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider sticky top-0 bg-violet-800 z-10"
                     >
                       {column.render('Header')}
                     </th>
@@ -169,7 +172,7 @@ const ProductTable: React.FC = () => {
                     {row.cells.map(cell => (
                       <td
                         {...cell.getCellProps()}
-                        className="px-4 py-3 whitespace-nowrap text-sm text-gray-700"
+                        className="px-4 py-3 whitespace-nowrap font-normal text-sm text-black bg-gray-300"
                       >
                         {cell.render('Cell')}
                       </td>

@@ -1,7 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTable, Column } from 'react-table';
+import { Link } from 'react-router-dom';
 import { FaRegEdit, FaRegTrashAlt, FaSearch, FaBox } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
+import axiosInstance from '../axiosEndPoint/axiosEndPoint';
+import { toast } from 'react-hot-toast';
 
 type User = {
   id: number;
@@ -12,55 +15,58 @@ type User = {
   status: string;
 };
 
-const users: User[] = [
-  {
-    id: 13464356,
-    name: "Alice Smith",
-    subcategory: "Subcategory A",
-    category: "Category 1",
-    image: "https://via.placeholder.com/150",
-    status: "active"
-  },
-  {
-    id: 2,
-    name: "Bob Johnson",
-    subcategory: "Subcategory B",
-    category: "Category 2",
-    image: "https://via.placeholder.com/150",
-    status: "active"
-  },
-  // Add more users as needed
-];
-
 const CategoryTable: React.FC = () => {
+  const [categories, setCategories] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        const response = await axiosInstance.get('/category', {
+          params: { userId } // Pass userId as a query parameter
+        });
+        
+        setCategories(response.data.categories);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        toast.error('Failed to fetch categories');
+      }
+    };
+  
+    fetchCategories();
+  }, []);
+
   const data = useMemo(() => {
-    if (!searchTerm) return users;
-    return users.filter(user =>
+    if (!searchTerm) return categories;
+    return categories.filter(user =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm]);
+  }, [searchTerm, categories]);
 
   const columns: Column<User>[] = useMemo(() => [
     {
       Header: 'ID',
-      accessor: 'id'
+      accessor: '_id',
+      Cell: ({ value }) => <span>{value.toString()}</span> // Convert _id to string
     },
     {
       Header: 'Category Name',
-      accessor: 'category'
+      accessor: 'name'
     },
     {
       Header: 'Image',
       accessor: 'image',
-      Cell: ({ value }) => <img src={value} alt="User" width="50" height="50" />
+      Cell: ({ value }) => <img src={value} alt="Category" width="50" height="50" />
     },
     {
       Header: 'Status',
-      accessor: 'status'
+      accessor: 'status',
+      Cell: ({ value }) => (
+        <span className={value ? 'text-green-500' : 'text-red-500'}>{value ? 'Active' : 'Inactive'}</span>
+      )
     },
     {
       Header: 'Actions',
@@ -83,6 +89,9 @@ const CategoryTable: React.FC = () => {
       )
     }
   ], []);
+  
+  
+  
 
   const handleEdit = (user: User) => {
     console.log('Edit', user);
@@ -132,9 +141,11 @@ const CategoryTable: React.FC = () => {
             />
           </div>
         </div>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">
-          Add Category
-        </button>
+        <Link to={'/add_category'}>
+          <button className="px-4 py-2 bg-violet-800 text-white rounded-lg hover:bg-blue-700">
+            Add New
+          </button>
+        </Link>
       </div>
       <div className="overflow-x-auto mb-1">
         <div className="max-h-[600px] overflow-y-auto"> {/* Set max-height as needed */}
@@ -145,7 +156,7 @@ const CategoryTable: React.FC = () => {
                   {headerGroup.headers.map(column => (
                     <th
                       {...column.getHeaderProps()}
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 bg-white z-10"
+                      className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider sticky top-0 bg-violet-800 z-10"
                     >
                       {column.render('Header')}
                     </th>
@@ -161,7 +172,7 @@ const CategoryTable: React.FC = () => {
                     {row.cells.map(cell => (
                       <td
                         {...cell.getCellProps()}
-                        className="px-4 py-3 whitespace-nowrap text-sm text-gray-700"
+                        className="px-4 py-3 whitespace-nowrap font-normal text-sm text-black bg-gray-300"
                       >
                         {cell.render('Cell')}
                       </td>
