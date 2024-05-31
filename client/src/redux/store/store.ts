@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, PersistConfig } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import rootReducer, { RootState } from './rootReducer'; // Adjust the import based on your file structure
+import rootReducer, { RootState } from '../rootReducer'; // Adjust the import based on your file structure
 
 const persistConfig: PersistConfig<RootState> = {
     key: 'root',

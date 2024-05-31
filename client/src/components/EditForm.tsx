@@ -12,6 +12,7 @@ const EditForm = ({ title, fields, icon, fetchItemDetails, onSubmit, type, categ
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -86,6 +87,7 @@ const EditForm = ({ title, fields, icon, fetchItemDetails, onSubmit, type, categ
   const handleSubmit = (e) => {
     e.preventDefault();
     const errors = validateForm();
+    setLoading(true)
     if (errors.length > 0) {
       toast.error(errors[0]);
     } else {
@@ -173,7 +175,7 @@ const EditForm = ({ title, fields, icon, fetchItemDetails, onSubmit, type, categ
           </div>
         )}
         <div className="mt-8 flex justify-end">
-          <button type="button" className="mr-6 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded" onClick={() => navigate('/products')}>
+          <button type="button" className="mr-6 bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded" onClick={() => navigate(-1)}>
             Cancel
           </button>
           <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">

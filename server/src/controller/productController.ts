@@ -2,17 +2,18 @@ import { Request, Response } from "express";
 import Product from "../models/productModel";
 import { IProduct } from "../interfaces/IProduct";
 import Subcategory from "../models/subCategorymodel";
+import Category from "../models/categoryModel";
 
 
-export const addProduct = async (req: Request, res: Response) => {
+export const addProduct = async (req: Request, res: Response): Promise<void> => {
    try {
-      const { category, image, productName, subcategory, userId } = req.body; // Ensure correct field names
+      const { category, image, productName, subcategory, userId } = req.body; 
 
       console.log("addprod", req.body);
 
-      const lowerCaseProduct = productName.toLowerCase();
+      const upperCaseProduct = productName.toUpperCase();
 
-      const existingProduct = await Product.findOne({ name: lowerCaseProduct, user: userId });
+      const existingProduct = await Product.findOne({ name: upperCaseProduct, user: userId });
 
       if (existingProduct) {
          res.status(400).json({ message: "Product already exists.", success: false });
@@ -20,9 +21,9 @@ export const addProduct = async (req: Request, res: Response) => {
       }
 
       const newProduct: IProduct = new Product({
-         name: lowerCaseProduct,
+         name: upperCaseProduct,
          category,
-         subcategory, // Ensure correct field name
+         subcategory,
          image,
          user: userId,
       });
@@ -30,37 +31,43 @@ export const addProduct = async (req: Request, res: Response) => {
       await newProduct.save();
 
       res.status(201).json({ message: "Product created successfully.", success: true });
+      return
 
    } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Server error.", success: false });
-      return;
    }
 }
 
 
-export const getProducts = async (req: Request, res: Response) => {
+export const getProducts = async (req: Request, res: Response): Promise<void> => {
    try {
-      const { userId } = req.query;
-      console.log('UserId:', userId); // Log userId for debugging
+     const { userId } = req.query;
+ 
+     let allProducts = await Product.find({ user: userId, isDeleted: false });
+ 
+     const products = await Promise.all(allProducts.map(async (product) => {
+       const category = await Category.findOne({ _id: product.category, isDeleted: false }).select('name _id');
+       const subcategory = await Subcategory.findOne({ _id: product.subcategory, isDeleted: false }).select('name _id');
+       
+       return {
+         ...product.toObject(),
+         category,
+         subcategory
+       };
+     }));
+  
+     res.status(200).json({ status: 'success', products });
+     return
 
-
-      const products = await Product.find({ user: userId, isDeleted: false })
-        .populate('category', 'name _id') 
-        .populate('subcategory', 'name _id'); 
-
-      console.log('Products:', products); // Log products for debugging
-
-      res.status(200).json({ status: 'success', products });
    } catch (error) {
-      console.log('Error:', error); // Log error for debugging
-      res.status(500).json({ status: 'error', message: 'Failed to fetch products' });
+     console.log(error); 
+     res.status(500).json({ status: 'error', message: 'Failed to fetch products' });
    }
-}
+};
 
 
-
-export const updateProducts = async (req: Request, res: Response) => {
+export const updateProducts = async (req: Request, res: Response): Promise<void> => {
    try {
 
       const {name, category, subcategory, image, status} = req.body
@@ -93,16 +100,19 @@ export const updateProducts = async (req: Request, res: Response) => {
    }
 }
 
-export const deleteProducts = async (req: Request, res: Response) => {
+export const deleteProducts = async (req: Request, res: Response): Promise<void> => {
    try {
 
       const id = req.params.id;
 
       const updatedProduct = await Product.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
       if (!updatedProduct) {
-         return res.status(404).json({ message: 'Product not found', success: false });
+         res.status(404).json({ message: 'Product not found', success: false });
+         return
       }
-      res.status(200).json({ message: 'Product soft deleted successfully', success: true });
+      res.status(200).json({ mesrsage: 'Product soft deleted successfully', success: true });
+      return
+
    } catch (error) {
       console.log(error);
       res.status(500).json({ message: 'Internal server error', success: false });
@@ -110,7 +120,7 @@ export const deleteProducts = async (req: Request, res: Response) => {
 }
 
 
-export const getSingleProduct = async (req: Request, res: Response) => {
+export const getSingleProduct = async (req: Request, res: Response): Promise<void> => {
    try {
       const id = req.params.id;
       const { userId } = req.query;
@@ -122,8 +132,7 @@ export const getSingleProduct = async (req: Request, res: Response) => {
       const subCategories = await Subcategory.find({category: product?.category})
       
       res.status(200).json({ product, subCategories });
-
-
+      return
       
    } catch (error) {
       console.log(error);

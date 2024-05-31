@@ -194,7 +194,7 @@ const CategoryTable: React.FC = () => {
           )}
         </div>
       </div>
-      <DeleteModal isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleDeleteConfirm} />
+      <DeleteModal title={'Are you sure you want to delete this item?'} isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleDeleteConfirm} />
     </div>
   );
 };

@@ -5,8 +5,9 @@ import { FaRegEdit, FaRegTrashAlt, FaSearch, FaBox } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
 import axiosInstance from '../axiosEndPoint/axiosEndPoint';
 import { toast } from 'react-hot-toast';
+import shortid from 'shortid';
 
-type User = {
+type Subcategory = {
   _id: string;
   name: string;
   subcategory: string;
@@ -18,10 +19,10 @@ type User = {
 };
 
 const SubcategoryTable: React.FC = () => {
-  const [subcategories, setSubcategories] = useState<User[]>([]);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<Subcategory | null>(null);
   const navigate = useNavigate();
 
   const fetchSubcategories = async () => {
@@ -49,15 +50,15 @@ const SubcategoryTable: React.FC = () => {
     );
   }, [searchTerm, subcategories]);
 
-  const columns: Column<User>[] = useMemo(() => [
+  const columns: Column<Subcategory>[] = useMemo(() => [
     {
       Header: 'ID',
       accessor: '_id',
-      Cell: ({ value }) => <span>{value.toString()}</span> // Convert id to string if needed
+      Cell: ({ value }) => <span>{value.toString()}</span>
     },
     {
       Header: 'Category Name',
-      accessor: 'category.name' // Access the category name from the user object
+      accessor: 'category.name' 
     },
     {
       Header: 'Subcategory',
@@ -99,10 +100,10 @@ const SubcategoryTable: React.FC = () => {
 
   const handleEdit = (subcategoryId: string) => {
     console.log("subcategoryId",subcategoryId)
-    navigate(`/edit_subcategory/${subcategoryId}`); // Navigate to the edit form with subcategory ID
+    navigate(`/edit_subcategory/${subcategoryId}`); 
   };
 
-  const handleDeleteClick = (user: User) => {
+  const handleDeleteClick = (user: Subcategory) => {
     setUserToDelete(user);
     setIsModalOpen(true);
   };
@@ -203,7 +204,7 @@ const SubcategoryTable: React.FC = () => {
           )}
         </div>
       </div>
-      <DeleteModal isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleDeleteConfirm} />
+      <DeleteModal title={'Are you sure you want to delete this item?'} isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleDeleteConfirm} />
     </div>
   );
 };

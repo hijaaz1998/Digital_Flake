@@ -1,7 +1,4 @@
-import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import LoginPage from './pages/LoginPage'
-import SignupPage from './pages/SignupPage'
 import HomePage from './pages/HomePage'
 import Dashboard from './components/Dashboard'
 import CategoryTable from './components/CategoryTable'
@@ -14,6 +11,7 @@ import EditSubcategory from './components/EditSubCategory'
 import EditCategory from './components/EditCategory'
 import EditProduct from './components/EditProduct'
 import { PrivateRoutes } from './components/PrivateRoute'
+import AuthPage from './pages/AuthPage'
 
 const App = () => {
   return (
@@ -21,8 +19,9 @@ const App = () => {
       <Router>
         <Routes>
 
-          <Route path='/' element={ <LoginPage /> }/>
-          <Route path='/signup' element={ <SignupPage /> }/>
+          <Route path='/' element={ <AuthPage /> }/>
+          <Route path='/signup' element={ <AuthPage /> }/>
+          <Route path='/forgot_password' element={ <AuthPage /> }/>
 
           <Route element={ <PrivateRoutes />}>
             <Route path='/home' element={ <HomePage children={ <Dashboard/> } /> }/>

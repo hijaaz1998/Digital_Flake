@@ -7,9 +7,9 @@ export const addCategory = async (req: Request, res: Response): Promise<void> =>
    try {
      const { categoryName, image, userId } = req.body;
  
-     const lowerCaseCategoryName = categoryName.toLowerCase();
+     const upperCaseCategory = categoryName.toUpperCase();
  
-     const existingCategory = await Category.findOne({ name: lowerCaseCategoryName, user: userId });
+     const existingCategory = await Category.findOne({ name: upperCaseCategory, user: userId });
  
      if (existingCategory) {
        res.status(400).json({ message: "Category already exists.", success: false });
@@ -17,7 +17,7 @@ export const addCategory = async (req: Request, res: Response): Promise<void> =>
      }
  
      const newCategory: ICategory = new Category({
-       name: lowerCaseCategoryName,
+       name: upperCaseCategory,
        image,
        user: userId,
      });
@@ -26,10 +26,10 @@ export const addCategory = async (req: Request, res: Response): Promise<void> =>
  
      res.status(201).json({ message: "Category created successfully.", success: true });
      return
+     
    } catch (error) {
      console.log(error);
      res.status(500).json({ message: "Server error.", success: false });
-     return
    }
  };
 
@@ -38,8 +38,10 @@ export const addCategory = async (req: Request, res: Response): Promise<void> =>
      const { userId } = req.query;
  
      const categories = await Category.find({ user: userId, isDeleted: false });
-     console.log(categories)
+
      res.status(200).json({categories});
+     return 
+
      return
    } catch (error) {
      console.log(error);
@@ -70,21 +72,25 @@ export const addCategory = async (req: Request, res: Response): Promise<void> =>
      }
 
      res.status(200).json({ success: true, message: 'Category updated' });
+     return
+
   } catch (error) {
      console.log(error);
      res.status(500).json({ success: false, message: 'Server error' });
   }
 }
 
-export const deleteCategory = async (req: Request, res: Response) => {
+export const deleteCategory = async (req: Request, res: Response): Promise<void> => {
   try {
 
      const id = req.params.id;
 
      const updatedCategory = await Category.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
      if (!updatedCategory) {
-        return res.status(404).json({ message: 'Category not found', success: false });
+        res.status(404).json({ message: 'Category not found', success: false });
+        return
      }
+
      res.status(200).json({ message: 'Category soft deleted successfully', success: true });
      return
      
@@ -95,7 +101,7 @@ export const deleteCategory = async (req: Request, res: Response) => {
 }
 
 
-export const getPopulatedCategories = async (req: Request, res: Response) => {
+export const getPopulatedCategories = async (req: Request, res: Response): Promise<void> => {
   try {
     const categories = await Category.find({ isDeleted: false });
 
@@ -104,27 +110,28 @@ export const getPopulatedCategories = async (req: Request, res: Response) => {
       return { ...category.toObject(), subcategories };
     }));
 
-    console.log('populated', populatedCategories)
-
     res.status(200).json({ categories: populatedCategories });
+    return
+
   } catch (error) {
-    console.error('Error fetching categories:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.log( error);
+    res.status(500).json({ error: 'Internal server error', success: false });
   }
 }
   
-export const getSingleCategory = async (req: Request, res: Response) => {
+export const getSingleCategory = async (req: Request, res: Response): Promise<void> => {
   try {
 
     const id = req.params.id;
     const {userId} = req.query
 
     const category = await Category.findOne({user: userId, _id: id})
-    console.log("cat",category)
 
     res.status(200).json({category})
+    return
     
   } catch (error) {
     console.log(error)
+    res.status(500).json({ error: 'Internal server error', success: false });
   }
 } 

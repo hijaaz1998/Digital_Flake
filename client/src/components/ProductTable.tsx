@@ -5,6 +5,7 @@ import DeleteModal from './DeleteModal';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosEndPoint/axiosEndPoint';
 import toast from 'react-hot-toast';
+import shortid from 'shortid';
 
 type Product = {
   id: string;  
@@ -33,6 +34,7 @@ const ProductTable: React.FC = () => {
 
       const cleanedProducts: Product[] = response.data.products.map((product: any) => ({
         id: product._id,
+        humanReadableId: shortid.generate(),
         name: product.name,
         subcategory: product.subcategory.name,
         category: product.category.name,
@@ -212,7 +214,7 @@ const ProductTable: React.FC = () => {
           )}
         </div>
       </div>
-      <DeleteModal isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleDeleteConfirm} />
+      <DeleteModal title={'Are you sure you want to delete this item?'} isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleDeleteConfirm} />
     </div>
   );
 };

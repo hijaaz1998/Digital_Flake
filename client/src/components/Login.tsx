@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-hot-toast';
 import axiosInstance from '../axiosEndPoint/axiosEndPoint';
-import {login} from '../slices/userSlice';
+import {login} from '../redux/slices/userSlice';
 
 const Login: React.FC = () => {
 
@@ -51,7 +51,7 @@ const Login: React.FC = () => {
       <div className=" bg-opacity-50 rounded-lg p-8 backdrop-filter backdrop-blur-lg">
         <div className="items-center justify-center flex flex-col">
           <img src="/digitalFlake.png" alt="Digitalflake Logo" className="mb-4" />
-          <h2 className="text-xl text-white text-center mb-8">Welcome to Digitalflake Admin</h2>
+          <h2 className="text-xl text-violet-900 text-center mb-8">Welcome to Digitalflake Admin</h2>
         </div>
         <form onSubmit={handleLogin}>
           <div className="mb-6 relative">
@@ -79,7 +79,9 @@ const Login: React.FC = () => {
             />
           </div>
           <div className="mb-4 text-center">
-            <a href="#" className="text-md text-white hover:underline">Forgot Password?</a>
+            <Link to={'/forgot_password'} >
+              <a className="text-md text-violet-900 hover:underline">Forgot Password?</a>
+            </Link>
           </div>
           <div className="text-center">
             <button
@@ -91,7 +93,7 @@ const Login: React.FC = () => {
           </div>
         </form>
         <div className="text-center mt-4">
-          <Link to="/signup" className="text-white hover:text-violet-700">
+          <Link to="/signup" className="text-violet-900 hover:underline">
             Don't have an account? Sign Up
           </Link>
         </div>

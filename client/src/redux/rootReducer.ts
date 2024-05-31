@@ -1,5 +1,5 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import userReducer, { UserState } from '../slices/userSlice';
+import userReducer, { UserState } from '../redux/slices/userSlice';
 
 export interface RootState {
     user: UserState;

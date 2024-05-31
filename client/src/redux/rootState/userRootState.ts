@@ -1,4 +1,4 @@
-import { UserState } from "../../slices/userSlice";
+import { UserState } from "../../redux/slices/userSlice";
 
 interface UserRootState {
     user: UserState
