@@ -50,3 +50,22 @@ export const getSubcategories = async (req: Request, res: Response) => {
    }
 };
 
+export const getSingleSubcategory = async (req: Request, res: Response) => {
+   try {
+      const id = req.params.id;
+      const {userId} = req.query
+
+      const subCategories = await Subcategory.findOne({ user: userId, _id: id})
+         .populate('category', 'name _id')
+
+      console.log(subCategories)
+
+      res.status(200).json({subCategories})
+   } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'Server error' });
+      return;
+   }
+}
+
+

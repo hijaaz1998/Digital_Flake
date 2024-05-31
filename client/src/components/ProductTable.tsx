@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useTable, Column } from 'react-table';
 import { FaRegEdit, FaRegTrashAlt, FaSearch, FaBox } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosEndPoint/axiosEndPoint';
 
 type Product = {
@@ -15,6 +15,9 @@ type Product = {
 };
 
 const ProductTable: React.FC = () => {
+
+  const navigate = useNavigate();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
@@ -86,7 +89,7 @@ const ProductTable: React.FC = () => {
         <div className="flex space-x-2">
           <button
             className="text-gray-600 text-xl hover:text-gray-900"
-            onClick={() => handleEdit(row.original)}
+            onClick={() => handleEdit(row.original.id)}
           >
             <FaRegEdit />
           </button>
@@ -101,8 +104,9 @@ const ProductTable: React.FC = () => {
     }
   ], []);
 
-  const handleEdit = (product: Product) => {
-    console.log('Edit', product);
+  const handleEdit = (productId: string) => {
+    console.log("productId",productId)
+    navigate(`/edit_product/${productId}`); // Navigate to the edit form with subcategory ID
   };
 
   const handleDeleteClick = (product: Product) => {

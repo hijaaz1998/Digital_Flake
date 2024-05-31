@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTable, Column } from 'react-table';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaRegEdit, FaRegTrashAlt, FaSearch, FaBox } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
 import axiosInstance from '../axiosEndPoint/axiosEndPoint';
@@ -23,6 +23,7 @@ const CategoryTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -84,7 +85,7 @@ const CategoryTable: React.FC = () => {
         <div className="flex space-x-2">
           <button
             className="text-gray-600 text-xl hover:text-gray-900"
-            onClick={() => handleEdit(row.original)}
+            onClick={() => handleEdit(row.original._id)}
           >
             <FaRegEdit />
           </button>
@@ -98,10 +99,10 @@ const CategoryTable: React.FC = () => {
       )
     }
   ], []);
-  
 
-  const handleEdit = (user: User) => {
-    console.log('Edit', user);
+  const handleEdit = (subcategoryId: string) => {
+    console.log("subcategoryId",subcategoryId)
+    navigate(`/edit_subcategory/${subcategoryId}`); // Navigate to the edit form with subcategory ID
   };
 
   const handleDeleteClick = (user: User) => {

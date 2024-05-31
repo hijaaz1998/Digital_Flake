@@ -10,6 +10,9 @@ import ProductTable from './components/ProductTable'
 import AddCategory from './components/AddCategory'
 import AddProduct from './components/AddProduct'
 import AddSubcategory from './components/AddSubCategory'
+import EditSubcategory from './components/EditSubCategory'
+import EditCategory from './components/EditCategory'
+import EditProduct from './components/EditProduct'
 
 const App = () => {
   return (
@@ -27,6 +30,10 @@ const App = () => {
           <Route path='/add_category' element={ <HomePage children={ <AddCategory/> } /> }/>
           <Route path='/add_product' element={ <HomePage children={ <AddProduct/> } /> }/>
           <Route path='/add_subcategory' element={ <HomePage children={ <AddSubcategory/> } /> }/>
+          <Route path='/edit_subcategory/:id' element={ <HomePage children={ <EditSubcategory/> } /> }/>
+          <Route path='/edit_category/:id' element={ <HomePage children={ <EditCategory/> } /> }/>
+          <Route path='/edit_product/:id' element={ <HomePage children={ <EditProduct/> } /> }/>
+          
         </Routes>
       </Router>
     </>

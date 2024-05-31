@@ -1,5 +1,5 @@
 import express from 'express';
-import { addCategory, getCategories, updateCategory, deleteCategory, getPopulatedCategories } from '../controller/categoryController';
+import { addCategory, getCategories, updateCategory, deleteCategory, getPopulatedCategories, getSingleCategory } from '../controller/categoryController';
 
 const categoryRoute = express.Router();
 
@@ -8,6 +8,8 @@ categoryRoute.route('/category')
   .get(getCategories)
   .put(updateCategory)
   .delete(deleteCategory);
+
+categoryRoute.get('/category/:id', getSingleCategory)
 
 categoryRoute.get('/categories', getPopulatedCategories )
 

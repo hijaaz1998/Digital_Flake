@@ -82,3 +82,18 @@ export const getPopulatedCategories = async (req: Request, res: Response) => {
   }
 }
   
+export const getSingleCategory = async (req: Request, res: Response) => {
+  try {
+
+    const id = req.params.id;
+    const {userId} = req.query
+
+    const category = await Category.findOne({user: userId, _id: id})
+    console.log("cat",category)
+
+    res.status(200).json({category})
+    
+  } catch (error) {
+    console.log(error)
+  }
+} 

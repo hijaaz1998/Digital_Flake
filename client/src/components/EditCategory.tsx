@@ -1,15 +1,72 @@
 import React from 'react';
-import EditingForm from './EditForm';
-import { HiTag } from 'react-icons/hi';
+import EditForm from './EditForm';
+import { HiViewGrid } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../axiosEndPoint/axiosEndPoint';
+import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const EditCategory = () => {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem('userId');
+
   const fields = [
-    { id: 'categoryName', label: 'Category Name', type: 'text' },
-    { id: 'status', label: 'Status', type: 'select', options: [{ value: '1', label: 'Option 1' }] },
-    { id: 'image', label: 'Image', type: 'file' },
+    { id: 'categoryName', label: 'Category Name', type: 'text', required: true },
+    { id: 'status', label: 'Status', type: 'select', required: true, options: ['Active', 'Inactive'] },
+    { id: 'image', label: 'Image', type: 'file', required: false },
   ];
 
-  return <EditingForm title="Edit Category" fields={fields} icon={HiTag} />;
+  const fetchCategoryDetails = async (id) => {
+    const response = await axiosInstance.get(`/category/${id}`, {
+      params: { userId }
+    });
+    const category = response.data.category;
+    console.log("catttt", category);
+
+    return {
+      categoryName: category.name,
+      status: category.status ? 'Active' : 'Inactive',
+      image: null,
+    };
+  };
+
+  const handleImageUpload = async (image) => {
+    const formData = new FormData();
+    formData.append('file', image);
+    formData.append('upload_preset', import.meta.env.VITE_UPLOAD_PRESET);
+    formData.append('cloud_name', import.meta.env.VITE_CLOUD_NAME);
+    const response = await axios.post(import.meta.env.VITE_CLOUDINARY_URL, formData);
+    return response.data.secure_url;
+  };
+
+  const handleSubmit = async (formData, id) => {
+    if (formData.image) {
+      const imageUrl = await handleImageUpload(formData.image);
+      formData.image = imageUrl;
+    }
+
+    formData.status = formData.status === 'Active';
+
+    try {
+      const response = await axiosInstance.put(`/category/${id}`, formData);
+      if (response.data.success) {
+        toast.success('Category updated successfully!');
+        navigate('/category');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update category');
+    }
+  };
+
+  return (
+    <EditForm
+      title="Edit Category"
+      fields={fields}
+      icon={HiViewGrid}
+      fetchItemDetails={fetchCategoryDetails}
+      onSubmit={handleSubmit}
+    />
+  );
 };
 
 export default EditCategory;

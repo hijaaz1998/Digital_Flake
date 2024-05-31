@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Product from "../models/productModel";
 import { IProduct } from "../interfaces/IProduct";
+import Subcategory from "../models/subCategorymodel";
 
 
 export const addProduct = async (req: Request, res: Response) => {
@@ -72,5 +73,27 @@ export const deleteProducts = async (req: Request, res: Response) => {
       
    } catch (error) {
       console.log(error)
+   }
+}
+
+
+export const getSingleProduct = async (req: Request, res: Response) => {
+   try {
+      const id = req.params.id;
+      const { userId } = req.query;
+
+      const product = await Product.findOne({ user: userId, _id: id })
+                                  .populate('category', 'name _id')
+                                  .populate('subcategory', 'name _id');
+
+      const subCategories = await Subcategory.find({category: product?.category})
+      
+      res.status(200).json({ product, subCategories });
+
+
+      
+   } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: 'Server error' });
    }
 }
