@@ -1,13 +1,14 @@
 import React from 'react';
 import EditForm from './EditForm';
 import { HiViewGrid } from 'react-icons/hi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../axiosEndPoint/axiosEndPoint';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 
 const EditProduct = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); // Get the product ID from the URL
 
   const fields = [
     { id: 'name', label: 'Product Name', type: 'text', required: true },
@@ -37,6 +38,7 @@ const EditProduct = () => {
       return {};
     }
   };
+  
 
   const handleImageUpload = async (image) => {
     try {

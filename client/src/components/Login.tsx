@@ -51,7 +51,7 @@ const Login: React.FC = () => {
       <div className=" bg-opacity-50 rounded-lg p-8 backdrop-filter backdrop-blur-lg">
         <div className="items-center justify-center flex flex-col">
           <img src="/digitalFlake.png" alt="Digitalflake Logo" className="mb-4" />
-          <h2 className="text-xl text-gray-400 text-center mb-8">Welcome to Digitalflake Admin</h2>
+          <h2 className="text-xl text-white text-center mb-8">Welcome to Digitalflake Admin</h2>
         </div>
         <form onSubmit={handleLogin}>
           <div className="mb-6 relative">
@@ -79,19 +79,19 @@ const Login: React.FC = () => {
             />
           </div>
           <div className="mb-4 text-center">
-            <a href="#" className="text-md text-black hover:underline">Forgot Password?</a>
+            <a href="#" className="text-md text-white hover:underline">Forgot Password?</a>
           </div>
           <div className="text-center">
             <button
               type="submit"
-              className="bg-amber-500 hover:bg-white border-2 border-transparent hover:border-amber-500 rounded-3xl hover:text-amber-500 text-white font-semibold py-2 px-20 focus:outline-none focus:shadow-outline transition duration-300"
+              className="bg-violet-900 border-2 border-transparent hover:bg-white hover:border-violet-900 rounded-3xl hover:text-violet-900 text-white font-semibold py-2 px-20 focus:outline-none focus:shadow-outline transition duration-300"
             >
               Sign In
             </button>
           </div>
         </form>
         <div className="text-center mt-4">
-          <Link to="/signup" className="text-amber-500 hover:text-amber-700">
+          <Link to="/signup" className="text-white hover:text-violet-700">
             Don't have an account? Sign Up
           </Link>
         </div>

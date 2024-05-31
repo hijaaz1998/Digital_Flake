@@ -1,18 +1,19 @@
 import React from 'react';
 import EditForm from './EditForm';
 import { HiViewGrid } from 'react-icons/hi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../axiosEndPoint/axiosEndPoint';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 
 const EditSubcategory = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); // Use useParams to get the ID from the URL
 
   const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
   const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
   const UPLOAD_URL = import.meta.env.VITE_CLOUDINARY_URL;
-  const userId = localStorage.getItem('userId')
+  const userId = localStorage.getItem('userId');
 
   const fields = [
     { id: 'subcategoryName', label: 'Subcategory Name', type: 'text', required: true },
@@ -22,18 +23,22 @@ const EditSubcategory = () => {
   ];
 
   const fetchSubcategoryDetails = async (id) => {
-    const response = await axiosInstance.get(`/sub_category/${id}`, {
-      params: { userId }
-    });
-    const subcategory = response.data.subCategories;
-    console.log('subcateg', subcategory);
-    console.log('subcateg', subcategory.category._id);
-    return {
-      subcategoryName: subcategory.name,
-      category: subcategory.category._id,
-      status: subcategory.status ? 'Active' : 'Inactive',
-      image: null,
-    };
+    try {
+      const response = await axiosInstance.get(`/sub_category/${id}`, {
+        params: { userId }
+      });
+      const subcategory = response.data.subCategories;
+      console.log('subcateg', subcategory);
+      return {
+        subcategoryName: subcategory.name,
+        category: subcategory.category._id,
+        status: subcategory.status ? 'Active' : 'Inactive',
+        image: null,
+      };
+    } catch (error) {
+      console.error('Error fetching subcategory details:', error);
+      return {};
+    }
   };
 
   const handleImageUpload = async (image) => {
@@ -49,6 +54,8 @@ const EditSubcategory = () => {
     if (formData.image) {
       const imageUrl = await handleImageUpload(formData.image);
       formData.image = imageUrl;
+    } else {
+      delete formData.image; // Remove image field if not provided
     }
 
     formData.status = formData.status === 'Active';
@@ -71,6 +78,7 @@ const EditSubcategory = () => {
       icon={HiViewGrid}
       fetchItemDetails={fetchSubcategoryDetails}
       onSubmit={handleSubmit}
+      id={id} // Pass the ID to the EditForm component
     />
   );
 };

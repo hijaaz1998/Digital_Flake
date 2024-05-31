@@ -4,9 +4,10 @@ import { FaRegEdit, FaRegTrashAlt, FaSearch, FaBox } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosEndPoint/axiosEndPoint';
+import toast from 'react-hot-toast';
 
 type Product = {
-  id: string;  // Changed to string to match _id from the server
+  id: string;  
   name: string;
   subcategory: string;
   category: string;
@@ -23,29 +24,28 @@ const ProductTable: React.FC = () => {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
 
+  const fetchProducts = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const response = await axiosInstance.get('/product', {
+        params: { userId }
+      });
+
+      const cleanedProducts: Product[] = response.data.products.map((product: any) => ({
+        id: product._id,
+        name: product.name,
+        subcategory: product.subcategory.name,
+        category: product.category.name,
+        image: product.image,
+        status: product.status ? 'Active' : 'Inactive'
+      }));
+      setProducts(cleanedProducts);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const userId = localStorage.getItem('userId');
-        const response = await axiosInstance.get('/product', {
-          params: { userId }
-        });
-        console.log('products', response.data.products);
-
-        const cleanedProducts: Product[] = response.data.products.map((product: any) => ({
-          id: product._id,
-          name: product.name,
-          subcategory: product.subcategory.name,
-          category: product.category.name,
-          image: product.image,
-          status: product.status ? 'Active' : 'Inactive'
-        }));
-        setProducts(cleanedProducts);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-
     fetchProducts();
   }, []);
 
@@ -76,11 +76,14 @@ const ProductTable: React.FC = () => {
     {
       Header: 'Image',
       accessor: 'image',
-      Cell: ({ value }) => <img src={value} alt="Product" width="50" height="50" />
+      Cell: ({ value }) => <img src={value} alt="Product" className="w-12 h-12 object-cover" />
     },
     {
       Header: 'Status',
-      accessor: 'status'
+      accessor: 'status',
+      Cell: ({ value }) => (
+        <span className={value === 'Active' ? 'text-green-500' : 'text-red-500'}>{value}</span>
+      )
     },
     {
       Header: 'Actions',
@@ -105,8 +108,7 @@ const ProductTable: React.FC = () => {
   ], []);
 
   const handleEdit = (productId: string) => {
-    console.log("productId",productId)
-    navigate(`/edit_product/${productId}`); // Navigate to the edit form with subcategory ID
+    navigate(`/edit_product/${productId}`);
   };
 
   const handleDeleteClick = (product: Product) => {
@@ -114,11 +116,19 @@ const ProductTable: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (productToDelete) {
-      console.log('Delete', productToDelete);
-      setIsModalOpen(false);
-      setProductToDelete(null);
+      try {
+        const response = await axiosInstance.delete(`/product/${productToDelete.id}`);
+        if(response.data.success){
+          toast.success('Product deleted successfully')
+          setIsModalOpen(false);
+          navigate('/products')
+          fetchProducts();
+        }
+      } catch (error) {
+       toast.error(error.message)
+      }
     }
   };
 
@@ -161,39 +171,45 @@ const ProductTable: React.FC = () => {
       </div>
       <div className="overflow-x-auto mb-1">
         <div className="max-h-[600px] overflow-y-auto">
-          <table {...getTableProps()} className="min-w-full bg-white border border-gray-200 table-fixed">
-            <thead className="bg-gray-50">
-              {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()} className="border-b">
-                  {headerGroup.headers.map(column => (
-                    <th
-                      {...column.getHeaderProps()}
-                      className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider sticky top-0 bg-violet-800 z-10"
-                    >
-                      {column.render('Header')}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {rows.map(row => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()} className="border-b">
-                    {row.cells.map(cell => (
-                      <td
-                        {...cell.getCellProps()}
-                        className="px-4 py-3 whitespace-nowrap font-normal text-sm text-black bg-gray-300"
+          {products.length === 0 ? (
+            <div className="text-center py-4 text-gray-600">
+              No products found.
+            </div>
+          ) : (
+            <table {...getTableProps()} className="min-w-full bg-white border border-gray-200">
+              <thead className="bg-gray-50">
+                {headerGroups.map(headerGroup => (
+                  <tr {...headerGroup.getHeaderGroupProps()} className="border-b">
+                    {headerGroup.headers.map(column => (
+                      <th
+                        {...column.getHeaderProps()}
+                        className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider bg-violet-900 text-white sticky top-0"
                       >
-                        {cell.render('Cell')}
-                      </td>
+                        {column.render('Header')}
+                      </th>
                     ))}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </thead>
+              <tbody>
+                {rows.map(row => {
+                  prepareRow(row);
+                  return (
+                    <tr {...row.getRowProps()} className="border-b hover:bg-gray-100">
+                      {row.cells.map(cell => (
+                        <td
+                          {...cell.getCellProps()}
+                          className="px-4 py-3 whitespace-nowrap font-normal text-sm text-gray-900"
+                        >
+                          {cell.render('Cell')}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
       <DeleteModal isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleDeleteConfirm} />

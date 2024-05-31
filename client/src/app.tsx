@@ -13,6 +13,7 @@ import AddSubcategory from './components/AddSubCategory'
 import EditSubcategory from './components/EditSubCategory'
 import EditCategory from './components/EditCategory'
 import EditProduct from './components/EditProduct'
+import { PrivateRoutes } from './components/PrivateRoute'
 
 const App = () => {
   return (
@@ -23,17 +24,19 @@ const App = () => {
           <Route path='/' element={ <LoginPage /> }/>
           <Route path='/signup' element={ <SignupPage /> }/>
 
-          <Route path='/home' element={ <HomePage children={ <Dashboard/> } /> }/>
-          <Route path='/category' element={ <HomePage children={ <CategoryTable/> } /> }/>
-          <Route path='/subcategory' element={ <HomePage children={ <SubcategoryTable/> } /> }/>
-          <Route path='/products' element={ <HomePage children={ <ProductTable/> } /> }/>
-          <Route path='/add_category' element={ <HomePage children={ <AddCategory/> } /> }/>
-          <Route path='/add_product' element={ <HomePage children={ <AddProduct/> } /> }/>
-          <Route path='/add_subcategory' element={ <HomePage children={ <AddSubcategory/> } /> }/>
-          <Route path='/edit_subcategory/:id' element={ <HomePage children={ <EditSubcategory/> } /> }/>
-          <Route path='/edit_category/:id' element={ <HomePage children={ <EditCategory/> } /> }/>
-          <Route path='/edit_product/:id' element={ <HomePage children={ <EditProduct/> } /> }/>
-          
+          <Route element={ <PrivateRoutes />}>
+            <Route path='/home' element={ <HomePage children={ <Dashboard/> } /> }/>
+            <Route path='/category' element={ <HomePage children={ <CategoryTable/> } /> }/>
+            <Route path='/subcategory' element={ <HomePage children={ <SubcategoryTable/> } /> }/>
+            <Route path='/products' element={ <HomePage children={ <ProductTable/> } /> }/>
+            <Route path='/add_category' element={ <HomePage children={ <AddCategory/> } /> }/>
+            <Route path='/add_product' element={ <HomePage children={ <AddProduct/> } /> }/>
+            <Route path='/add_subcategory' element={ <HomePage children={ <AddSubcategory/> } /> }/>
+            <Route path='/edit_subcategory/:id' element={ <HomePage children={ <EditSubcategory/> } /> }/>
+            <Route path='/edit_category/:id' element={ <HomePage children={ <EditCategory/> } /> }/>
+            <Route path='/edit_product/:id' element={ <HomePage children={ <EditProduct/> } /> }/>
+          </Route>
+
         </Routes>
       </Router>
     </>

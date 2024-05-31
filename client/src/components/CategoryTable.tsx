@@ -6,52 +6,50 @@ import DeleteModal from './DeleteModal';
 import axiosInstance from '../axiosEndPoint/axiosEndPoint';
 import { toast } from 'react-hot-toast';
 
-type User = {
-  id: number;
+type Category = {
+  _id: string;
   name: string;
-  subcategory: string;
-  category: string;
   image: string;
-  status: string;
+  status: boolean;
 };
 
 const CategoryTable: React.FC = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<User[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+
+  const fetchCategories = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const response = await axiosInstance.get('/category', {
+        params: { userId }
+      });
+      
+      setCategories(response.data.categories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      toast.error('Failed to fetch categories');
+    }
+  };
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const userId = localStorage.getItem('userId');
-        const response = await axiosInstance.get('/category', {
-          params: { userId } // Pass userId as a query parameter
-        });
-        
-        setCategories(response.data.categories);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        toast.error('Failed to fetch categories');
-      }
-    };
-  
     fetchCategories();
   }, []);
 
   const data = useMemo(() => {
     if (!searchTerm) return categories;
-    return categories.filter(user =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    return categories.filter(category =>
+      category.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [searchTerm, categories]);
 
-  const columns: Column<User>[] = useMemo(() => [
+  const columns: Column<Category>[] = useMemo(() => [
     {
       Header: 'ID',
       accessor: '_id',
-      Cell: ({ value }) => <span>{value.toString()}</span> // Convert _id to string
+      Cell: ({ value }) => <span>{value.toString()}</span>
     },
     {
       Header: 'Category Name',
@@ -90,31 +88,35 @@ const CategoryTable: React.FC = () => {
       )
     }
   ], []);
-  
-  
-  
 
   const handleEdit = (categoryId: string) => {
-    console.log("categoryId",categoryId)
-    navigate(`/edit_category/${categoryId}`); // Navigate to the edit form with subcategory ID
+    navigate(`/edit_category/${categoryId}`);
   };
 
-  const handleDeleteClick = (user: User) => {
-    setUserToDelete(user);
+  const handleDeleteClick = (category: Category) => {
+    setCategoryToDelete(category);
     setIsModalOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    if (userToDelete) {
-      console.log('Delete', userToDelete);
-      setIsModalOpen(false);
-      setUserToDelete(null);
+  const handleDeleteConfirm = async () => {
+    if (categoryToDelete) {
+      try {
+        const response = await axiosInstance.delete(`/category/${categoryToDelete._id}`)
+        if(response.data.success){
+          toast.success('Category deleted')
+          setIsModalOpen(false);
+          navigate('/category')
+          fetchCategories();
+        }
+      } catch (error) {
+        toast.error(error.message)
+      }
     }
   };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setUserToDelete(null);
+    setCategoryToDelete(null);
   };
 
   const {
@@ -150,40 +152,46 @@ const CategoryTable: React.FC = () => {
         </Link>
       </div>
       <div className="overflow-x-auto mb-1">
-        <div className="max-h-[600px] overflow-y-auto"> {/* Set max-height as needed */}
-          <table {...getTableProps()} className="min-w-full bg-white border border-gray-200 table-fixed">
-            <thead className="bg-gray-50">
-              {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()} className="border-b">
-                  {headerGroup.headers.map(column => (
-                    <th
-                      {...column.getHeaderProps()}
-                      className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider sticky top-0 bg-violet-800 z-10"
-                    >
-                      {column.render('Header')}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {rows.map(row => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()} className="border-b">
-                    {row.cells.map(cell => (
-                      <td
-                        {...cell.getCellProps()}
-                        className="px-4 py-3 whitespace-nowrap font-normal text-sm text-black bg-gray-300"
+        <div className="max-h-[600px] overflow-y-auto">
+          {categories.length === 0 ? (
+            <div className="text-center py-4 text-gray-600">
+              No categories found.
+            </div>
+          ) : (
+            <table {...getTableProps()} className="min-w-full bg-white border border-gray-200">
+              <thead className="bg-gray-50">
+                {headerGroups.map(headerGroup => (
+                  <tr {...headerGroup.getHeaderGroupProps()} className="border-b">
+                    {headerGroup.headers.map(column => (
+                      <th
+                        {...column.getHeaderProps()}
+                        className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider bg-violet-900 text-white sticky top-0"
                       >
-                        {cell.render('Cell')}
-                      </td>
+                        {column.render('Header')}
+                      </th>
                     ))}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </thead>
+              <tbody>
+                {rows.map(row => {
+                  prepareRow(row);
+                  return (
+                    <tr {...row.getRowProps()} className="border-b hover:bg-gray-100">
+                      {row.cells.map(cell => (
+                        <td
+                          {...cell.getCellProps()}
+                          className="px-4 py-3 whitespace-nowrap font-normal text-sm text-gray-900"
+                        >
+                          {cell.render('Cell')}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
       <DeleteModal isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleDeleteConfirm} />

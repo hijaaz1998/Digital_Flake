@@ -7,7 +7,7 @@ import axiosInstance from '../axiosEndPoint/axiosEndPoint';
 import { toast } from 'react-hot-toast';
 
 type User = {
-  id: number;
+  _id: string;
   name: string;
   subcategory: string;
   category: {
@@ -17,32 +17,30 @@ type User = {
   status: string;
 };
 
-
-const CategoryTable: React.FC = () => {
-  const [subcategories, setSubategories] = useState<User[]>([]);
+const SubcategoryTable: React.FC = () => {
+  const [subcategories, setSubcategories] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const navigate = useNavigate();
 
+  const fetchSubcategories = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const response = await axiosInstance.get('/sub_category', {
+        params: { userId }
+      });
+      
+      setSubcategories(response.data.subCategories);
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      toast.error('Failed to fetch subcategories');
+    }
+  };
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const userId = localStorage.getItem('userId');
-        const response = await axiosInstance.get('/sub_category', {
-          params: { userId }
-        });
-        
-        setSubategories(response.data.subCategories);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        toast.error('Failed to fetch categories');
-      }
-    };
-  
-    fetchCategories();
+    fetchSubcategories();
   }, []);
-  
 
   const data = useMemo(() => {
     if (!searchTerm) return subcategories;
@@ -50,7 +48,6 @@ const CategoryTable: React.FC = () => {
       user.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [searchTerm, subcategories]);
-  
 
   const columns: Column<User>[] = useMemo(() => [
     {
@@ -110,11 +107,19 @@ const CategoryTable: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (userToDelete) {
-      console.log('Delete', userToDelete);
-      setIsModalOpen(false);
-      setUserToDelete(null);
+      try {
+        const response = await axiosInstance.delete(`/sub_category/${userToDelete._id}`)
+        if(response.data.success){
+          toast.success('Subcategory deleted')
+          navigate('/subcategory')
+          setIsModalOpen(false);
+          fetchSubcategories();
+        }
+      } catch (error) {
+        toast.error(error.message)
+      }
     }
   };
 
@@ -156,40 +161,46 @@ const CategoryTable: React.FC = () => {
         </Link>
       </div>
       <div className="overflow-x-auto mb-1">
-        <div className="max-h-[600px] overflow-y-auto"> {/* Set max-height as needed */}
-          <table {...getTableProps()} className="min-w-full bg-white border border-gray-200 table-fixed">
-            <thead className="bg-gray-50">
-              {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()} className="border-b">
-                  {headerGroup.headers.map(column => (
-                    <th
-                      {...column.getHeaderProps()}
-                      className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider sticky top-0 bg-violet-800 z-10"
-                    >
-                      {column.render('Header')}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {rows.map(row => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()} className="border-b">
-                    {row.cells.map(cell => (
-                      <td
-                        {...cell.getCellProps()}
-                        className="px-4 py-3 whitespace-nowrap font-normal text-sm text-black bg-gray-300"
+        <div className="max-h-[600px] overflow-y-auto">
+          {subcategories.length === 0 ? (
+            <div className="text-center py-4 text-gray-600">
+              No subcategories found.
+            </div>
+          ) : (
+            <table {...getTableProps()} className="min-w-full bg-white border border-gray-200">
+              <thead className="bg-gray-50">
+                {headerGroups.map(headerGroup => (
+                  <tr {...headerGroup.getHeaderGroupProps()} className="border-b">
+                    {headerGroup.headers.map(column => (
+                      <th
+                        {...column.getHeaderProps()}
+                        className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider bg-violet-900 text-white sticky top-0"
                       >
-                        {cell.render('Cell')}
-                      </td>
+                        {column.render('Header')}
+                      </th>
                     ))}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </thead>
+              <tbody>
+                {rows.map(row => {
+                  prepareRow(row);
+                  return (
+                    <tr {...row.getRowProps()} className="border-b hover:bg-gray-100">
+                      {row.cells.map(cell => (
+                        <td
+                          {...cell.getCellProps()}
+                          className="px-4 py-3 whitespace-nowrap font-normal text-sm text-gray-900"
+                        >
+                          {cell.render('Cell')}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
       <DeleteModal isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleDeleteConfirm} />
@@ -197,4 +208,4 @@ const CategoryTable: React.FC = () => {
   );
 };
 
-export default CategoryTable;
+export default SubcategoryTable;

@@ -17,31 +17,31 @@ const Sidebar: React.FC = () => {
     <div className="w-2/12 h-full fixed left-0">
       <ul className="mt-10">
         <Link to="/home" className={`block ${getLinkClass('/home')}`}>
-          <li className="flex items-center justify-between py-4 px-4">
-            <HiHome className="mr-2 text-2xl" />
-            <span className="ml-3">Home</span>
-            <HiChevronRight className={`text-xl ml-auto ${getIconColorClass('/home')}`} />
+          <li className="flex items-center lg:justify-between justify-center py-4 px-4">
+            <HiHome className="text-2xl" />
+            <span className="ml-3 hidden lg:block">Home</span>
+            <HiChevronRight className={`text-xl ml-auto hidden lg:block ${getIconColorClass('/home')}`} />
           </li>
         </Link>
         <Link to="/category" className={`block ${getLinkClass('/category')}`}>
-          <li className="flex items-center justify-between py-4 px-4">
-            <HiViewGrid className="mr-2 text-2xl" />
-            <span className="ml-3">Category</span>
-            <HiChevronRight className={`text-xl ml-auto ${getIconColorClass('/category')}`} />
+          <li className="flex items-center lg:justify-between justify-center py-4 px-4">
+            <HiViewGrid className="text-2xl" />
+            <span className="ml-3 hidden lg:block">Category</span>
+            <HiChevronRight className={`text-xl ml-auto hidden lg:block ${getIconColorClass('/category')}`} />
           </li>
         </Link>
         <Link to="/subcategory" className={`block ${getLinkClass('/subcategory')}`}>
-          <li className="flex items-center justify-between py-4 px-4">
-            <HiTag className="mr-2 text-2xl" />
-            <span className="ml-3">Subcategory</span>
-            <HiChevronRight className={`text-xl ml-auto ${getIconColorClass('/subcategory')}`} />
+          <li className="flex items-center lg:justify-between justify-center py-4 px-4">
+            <HiTag className="text-2xl" />
+            <span className="ml-3 hidden lg:block">Subcategory</span>
+            <HiChevronRight className={`text-xl ml-auto hidden lg:block ${getIconColorClass('/subcategory')}`} />
           </li>
         </Link>
         <Link to="/products" className={`block ${getLinkClass('/products')}`}>
-          <li className="flex items-center justify-between py-4 px-4">
-            <HiShoppingCart className="mr-2 text-2xl" />
-            <span className="ml-3">Products</span>
-            <HiChevronRight className={`text-xl ml-auto ${getIconColorClass('/products')}`} />
+          <li className="flex items-center lg:justify-between justify-center py-4 px-4">
+            <HiShoppingCart className="text-2xl" />
+            <span className="ml-3 hidden lg:block">Products</span>
+            <HiChevronRight className={`text-xl ml-auto hidden lg:block ${getIconColorClass('/products')}`} />
           </li>
         </Link>
       </ul>

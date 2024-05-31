@@ -45,7 +45,7 @@ export const getProducts = async (req: Request, res: Response) => {
       console.log('UserId:', userId); // Log userId for debugging
 
 
-      const products = await Product.find({ user: userId })
+      const products = await Product.find({ user: userId, isDeleted: false })
         .populate('category', 'name _id') 
         .populate('subcategory', 'name _id'); 
 
@@ -62,17 +62,50 @@ export const getProducts = async (req: Request, res: Response) => {
 
 export const updateProducts = async (req: Request, res: Response) => {
    try {
-      
+
+      const {name, category, subcategory, image, status} = req.body
+
+      const {id} = req.params;
+
+      const updateData: any = {
+         name,
+         category,
+         subcategory,
+         status,
+      };
+
+      if (image) {
+         updateData.image = image;
+      }
+
+      const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {new: true})
+
+      if (!updatedProduct) {
+         res.status(404).json({ success: false, message: 'Product not found' });
+         return;
+      }
+
+      res.status(200).json({ success: true, mesage: 'Product updated successfully' });
+
    } catch (error) {
-      console.log(error)
+      console.log(error);
+      res.status(500).json({ success: false, message: 'Server error' });
    }
 }
 
 export const deleteProducts = async (req: Request, res: Response) => {
    try {
-      
+
+      const id = req.params.id;
+
+      const updatedProduct = await Product.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+      if (!updatedProduct) {
+         return res.status(404).json({ message: 'Product not found', success: false });
+      }
+      res.status(200).json({ message: 'Product soft deleted successfully', success: true });
    } catch (error) {
-      console.log(error)
+      console.log(error);
+      res.status(500).json({ message: 'Internal server error', success: false });
    }
 }
 

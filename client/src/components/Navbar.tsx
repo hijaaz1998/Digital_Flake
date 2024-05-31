@@ -2,9 +2,11 @@ import React from 'react';
 import { HiOutlineUser } from 'react-icons/hi';
 import { logout } from '../slices/userSlice';
 import { UseDispatch, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   
   return (
@@ -12,7 +14,10 @@ const Navbar: React.FC = () => {
       <div className="flex items-center ml-10">
         <img src="/digitalFlake.png" alt="Logo" className="h-10" />
       </div>
-      <div className="flex items-center mr-10 rounded-3xl" onClick={() => dispatch(logout())}>
+      <div className="flex items-center mr-10 rounded-3xl" onClick={() => {
+        dispatch(logout())
+        navigate('/')
+      }}>
         <HiOutlineUser className="text-white h-8 w-12" />
       </div>
     </div>

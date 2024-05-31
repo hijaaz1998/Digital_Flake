@@ -1,26 +1,18 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, PersistConfig } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import userReducer from '../slices/userSlice';
+import rootReducer, { RootState } from './rootReducer'; // Adjust the import based on your file structure
 
-type RootState = ReturnType<typeof rootReducer>;
-
-const persistUserConfig: PersistConfig<RootState> = {
-    key: 'user',
+const persistConfig: PersistConfig<RootState> = {
+    key: 'root',
     storage,
+    whitelist: ['user'], // Only persist the user slice
 };
 
-const rootReducer = combineReducers({
-    user: userReducer,
-});
-
-const persistedUserReducer = persistReducer(persistUserConfig, rootReducer);
+const persistedReducer = persistReducer<RootState>(persistConfig, rootReducer);
 
 export const store = configureStore({
-    reducer: {
-        user: persistedUserReducer
-    } ,
+    reducer: persistedReducer,
 });
 
 export const persistedStore = persistStore(store);
-

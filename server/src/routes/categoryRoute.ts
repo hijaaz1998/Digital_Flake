@@ -6,10 +6,11 @@ const categoryRoute = express.Router();
 categoryRoute.route('/category')
   .post(addCategory)
   .get(getCategories)
-  .put(updateCategory)
-  .delete(deleteCategory);
 
-categoryRoute.get('/category/:id', getSingleCategory)
+categoryRoute.route('/category/:id')
+  .get(getSingleCategory)
+  .put(updateCategory)
+  .delete(deleteCategory)
 
 categoryRoute.get('/categories', getPopulatedCategories )
 

@@ -6,9 +6,10 @@ const productRouter = express.Router();
 productRouter.route('/product')
    .post(addProduct)
    .get(getProducts)
+
+productRouter.route('/product/:id')
+   .get(getSingleProduct)
    .put(updateProducts)
    .delete(deleteProducts)
-
-productRouter.get('/product/:id', getSingleProduct)
 
 export default productRouter

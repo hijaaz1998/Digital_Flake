@@ -48,21 +48,52 @@ export const addCategory = async (req: Request, res: Response): Promise<void> =>
    }
  };
 
-export const updateCategory = async (req: Request, res: Response): Promise<void> => {
-   try {
-      
-   } catch (error) {
-      console.log(error)
-   }
+ export const updateCategory = async (req: Request, res: Response): Promise<void> => {
+  try {
+     const { categoryName, status, image } = req.body;
+     const { id } = req.params;
+
+     const updateData: any = {
+        name: categoryName,
+        status: status
+     };
+
+     if (image) {
+        updateData.image = image;
+     }
+
+     const updatedCategory = await Category.findByIdAndUpdate(id, updateData, { new: true });
+
+     if (!updatedCategory) {
+        res.status(404).json({ success: false, message: 'Category not found' });
+        return;
+     }
+
+     res.status(200).json({ success: true, message: 'Category updated' });
+  } catch (error) {
+     console.log(error);
+     res.status(500).json({ success: false, message: 'Server error' });
+  }
 }
 
-export const deleteCategory = async (req: Request, res: Response): Promise<void> => {
-   try {
-      
-   } catch (error) {
-      console.log(error)
-   }
+export const deleteCategory = async (req: Request, res: Response) => {
+  try {
+
+     const id = req.params.id;
+
+     const updatedCategory = await Category.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+     if (!updatedCategory) {
+        return res.status(404).json({ message: 'Category not found', success: false });
+     }
+     res.status(200).json({ message: 'Category soft deleted successfully', success: true });
+     return
+     
+  } catch (error) {
+     console.log(error);
+     res.status(500).json({ message: 'Internal server error', success: false });
+  }
 }
+
 
 export const getPopulatedCategories = async (req: Request, res: Response) => {
   try {

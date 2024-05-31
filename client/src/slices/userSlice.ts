@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import storage from 'redux-persist/lib/storage';
 
 export interface UserState {
     user: string;
@@ -17,12 +18,12 @@ const userSlice = createSlice({
         },
         logout: (state) => {
             state.user = '';
-            localStorage.removeItem('userId');
-            
+            storage.removeItem('persist:user');
+            localStorage.removeItem('userId'); // Clear user ID from local storage
         }
     }
 });
 
 export const { login, logout } = userSlice.actions;
-export const selectUser = (state: { user: UserState}) => state.user.user
+export const selectUser = (state: { user: UserState }) => state.user.user;
 export default userSlice.reducer;
